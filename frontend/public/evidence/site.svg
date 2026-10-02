@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Synthetic demonstration site photograph">
+  <rect width="400" height="300" fill="#eceef2"/>
+  <rect x="8" y="8" width="384" height="284" fill="#f6f7f9" stroke="#d5dae2"/>
+  <!-- sky / ground -->
+  <rect x="8" y="8" width="384" height="190" fill="#f6f7f9"/>
+  <rect x="8" y="198" width="384" height="94" fill="#e7ebf0"/>
+  <line x1="8" y1="198" x2="392" y2="198" stroke="#b0b9c7"/>
+  <!-- plot boundary -->
+  <polygon points="70,250 200,210 340,245 220,285" fill="none" stroke="#64748b" stroke-dasharray="6 5"/>
+  <!-- foundation outline -->
+  <rect x="150" y="150" width="110" height="60" fill="#d5dae2" stroke="#8492a6"/>
+  <line x1="150" y1="180" x2="260" y2="180" stroke="#8492a6"/>
+  <line x1="205" y1="150" x2="205" y2="210" stroke="#8492a6"/>
+  <!-- marker post -->
+  <rect x="96" y="150" width="4" height="48" fill="#8492a6"/>
+  <rect x="100" y="150" width="26" height="14" fill="#8492a6"/>
+  <text x="20" y="34" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="700" fill="#33405a">SITE PHOTOGRAPH</text>
+  <rect x="8" y="262" width="384" height="30" fill="#33405a"/>
+  <text x="200" y="282" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="0.5" fill="#ffffff">SYNTHETIC DEMONSTRATION EVIDENCE</text>
+</svg>

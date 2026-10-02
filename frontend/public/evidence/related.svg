@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Synthetic demonstration related-project photograph">
+  <rect width="400" height="300" fill="#eceef2"/>
+  <rect x="8" y="8" width="384" height="284" fill="#f6f7f9" stroke="#d5dae2"/>
+  <rect x="8" y="210" width="384" height="82" fill="#e7ebf0"/>
+  <line x1="8" y1="210" x2="392" y2="210" stroke="#b0b9c7"/>
+  <!-- building A -->
+  <rect x="60" y="120" width="110" height="90" fill="#d5dae2" stroke="#8492a6"/>
+  <polygon points="60,120 115,92 170,120" fill="#b0b9c7" stroke="#8492a6"/>
+  <rect x="98" y="160" width="34" height="50" fill="#f6f7f9" stroke="#8492a6"/>
+  <!-- building B -->
+  <rect x="230" y="120" width="110" height="90" fill="#d5dae2" stroke="#8492a6"/>
+  <polygon points="230,120 285,92 340,120" fill="#b0b9c7" stroke="#8492a6"/>
+  <rect x="268" y="160" width="34" height="50" fill="#f6f7f9" stroke="#8492a6"/>
+  <!-- link -->
+  <line x1="170" y1="165" x2="230" y2="165" stroke="#64748b" stroke-width="2" stroke-dasharray="6 4"/>
+  <circle cx="170" cy="165" r="4" fill="#64748b"/>
+  <circle cx="230" cy="165" r="4" fill="#64748b"/>
+  <text x="20" y="34" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="700" fill="#33405a">RELATED WORKS</text>
+  <text x="115" y="238" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#64748b">This work</text>
+  <text x="285" y="238" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#64748b">Comparable work</text>
+  <rect x="8" y="262" width="384" height="30" fill="#33405a"/>
+  <text x="200" y="282" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="0.5" fill="#ffffff">SYNTHETIC DEMONSTRATION EVIDENCE</text>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Synthetic demonstration work-progress photograph">
+  <rect width="400" height="300" fill="#eceef2"/>
+  <rect x="8" y="8" width="384" height="284" fill="#f6f7f9" stroke="#d5dae2"/>
+  <rect x="8" y="198" width="384" height="94" fill="#e7ebf0"/>
+  <line x1="8" y1="198" x2="392" y2="198" stroke="#b0b9c7"/>
+  <!-- half-built structure -->
+  <rect x="120" y="120" width="150" height="78" fill="#d5dae2" stroke="#8492a6"/>
+  <!-- unfinished top (dashed) -->
+  <rect x="120" y="92" width="150" height="28" fill="none" stroke="#8492a6" stroke-dasharray="6 5"/>
+  <!-- pillars -->
+  <rect x="135" y="92" width="8" height="106" fill="#b0b9c7"/>
+  <rect x="247" y="92" width="8" height="106" fill="#b0b9c7"/>
+  <!-- scaffold -->
+  <rect x="112" y="96" width="4" height="102" fill="#64748b"/>
+  <rect x="274" y="96" width="4" height="102" fill="#64748b"/>
+  <line x1="112" y1="130" x2="278" y2="130" stroke="#64748b"/>
+  <line x1="112" y1="164" x2="278" y2="164" stroke="#64748b"/>
+  <!-- crane -->
+  <rect x="300" y="70" width="4" height="128" fill="#8492a6"/>
+  <line x1="302" y1="74" x2="356" y2="74" stroke="#8492a6" stroke-width="3"/>
+  <line x1="340" y1="74" x2="340" y2="104" stroke="#8492a6"/>
+  <rect x="332" y="104" width="16" height="12" fill="#b0b9c7"/>
+  <text x="20" y="34" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="700" fill="#33405a">WORK IN PROGRESS</text>
+  <rect x="8" y="262" width="384" height="30" fill="#33405a"/>
+  <text x="200" y="282" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="0.5" fill="#ffffff">SYNTHETIC DEMONSTRATION EVIDENCE</text>
+</svg>
