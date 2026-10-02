@@ -18,6 +18,7 @@ from ..rbac import User, current_user
 from ..schemas import AgencyListResponse, DashboardStats, QueueResponse
 from ..services import analysis_service as svc
 from ..services import case_service as cases
+from ..services import evidence_service
 from ..services import intelligence_service as intel
 
 router = APIRouter(prefix="/api", tags=["dashboard"])
@@ -49,12 +50,14 @@ def investigation_queue(db: Session = Depends(get_db), user: User = Depends(curr
     items = svc.investigation_queue(context)
 
     index = cases.case_index(db) if user.can("view.cases") else {}
+    evidence_counts = evidence_service.counts_by_project(db)
     for item in items:
         state = index.get(item["project_id"])
         item["case_id"] = state["case_id"] if state else None
         item["case_status"] = state["status"] if state else None
         item["case_assigned_to"] = state["assigned_to"] if state else None
         item["case_outcome"] = state["outcome"] if state else None
+        item["evidence_count"] = evidence_counts.get(item["project_id"], 0)
 
     return {
         "total": len(items),

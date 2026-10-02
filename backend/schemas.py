@@ -28,6 +28,33 @@ class PaymentOut(BaseModel):
     transaction_sequence: int
 
 
+class EvidenceOut(BaseModel):
+    """One site/evidence image recorded against a work or a case.
+
+    Additive to the original prototype. ``image_url`` points at a static
+    demonstration asset; ``image_data`` holds an uploaded base64 data URL.
+    ``is_synthetic`` marks the seeded demonstration images so the interface can
+    label them as such and never imply an official photograph.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    project_id: str | None = None
+    case_id: str | None = None
+    item_key: str | None = None
+    evidence_type: str
+    caption: str | None = None
+    image_url: str | None = None
+    image_data: str | None = None
+    captured_date: date | None = None
+    uploaded_by: str | None = None
+    uploaded_role: str | None = None
+    reference: str | None = None
+    is_synthetic: bool = False
+    created_at: datetime | None = None
+
+
 class ProjectBase(BaseModel):
     """Every stored field of a work."""
 
@@ -79,6 +106,8 @@ class ProjectSummary(ProjectBase):
 class ProjectDetail(ProjectSummary):
     payments: list[PaymentOut] = Field(default_factory=list)
     analysis: dict[str, Any]
+    #: Site & evidence images recorded against the work (additive; may be empty).
+    evidence: list[EvidenceOut] = Field(default_factory=list)
 
 
 class ProjectListResponse(BaseModel):
@@ -130,6 +159,9 @@ class QueueItem(BaseModel):
     implementing_agency: str | None = None
     sanctioned_cost: float | None = None
     status: str | None = None
+
+    # Count of site/evidence images recorded against this work (additive).
+    evidence_count: int = 0
 
     # State of the investigation case on this work, when one has been opened.
     case_id: str | None = None
@@ -278,3 +310,19 @@ class VerificationItemRequest(BaseModel):
     completed: bool | None = None
     remark: str | None = None
     evidence_ref: str | None = None
+
+
+class CaseEvidenceRequest(BaseModel):
+    """An officer attaching a site/evidence image to a case.
+
+    Attaching evidence is not a verification. The image may be an uploaded data
+    URL (``image_data``) or a file reference; ``item_key`` ties it to one
+    verification step when supplied.
+    """
+
+    evidence_type: str = "Site photograph"
+    caption: str | None = None
+    image_data: str | None = None
+    image_url: str | None = None
+    reference: str | None = None
+    item_key: str | None = None

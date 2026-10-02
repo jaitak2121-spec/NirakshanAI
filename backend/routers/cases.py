@@ -18,6 +18,7 @@ from ..rbac import User, current_user
 from ..schemas import (
     CaseAssignRequest,
     CaseCreateRequest,
+    CaseEvidenceRequest,
     CaseOutcomeRequest,
     CaseRemarkRequest,
     CaseStatusRequest,
@@ -183,6 +184,33 @@ def add_remark(
     user: User = Depends(current_user),
 ):
     cases.add_remark(db, case_id, remark=payload.remark, user=user, reference=payload.reference)
+    return cases.case_detail(db, case_id, user)
+
+
+@router.post("/cases/{case_id}/evidence")
+def add_evidence(
+    case_id: str,
+    payload: CaseEvidenceRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+):
+    """Attach a site/evidence image to a case, optionally to one verification step.
+
+    Attaching evidence is recorded in the audit trail but is not a verification:
+    it does not complete a checklist item, change the case status, or alter the
+    risk score. Marking a step complete remains a separate officer action.
+    """
+    cases.add_evidence(
+        db,
+        case_id,
+        user=user,
+        evidence_type=payload.evidence_type,
+        caption=payload.caption,
+        image_data=payload.image_data,
+        image_url=payload.image_url,
+        reference=payload.reference,
+        item_key=payload.item_key,
+    )
     return cases.case_detail(db, case_id, user)
 
 

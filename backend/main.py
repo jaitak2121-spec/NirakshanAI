@@ -142,6 +142,7 @@ def api_root():
             "POST /api/cases/{case_id}/status",
             "POST /api/cases/{case_id}/outcome",
             "POST /api/cases/{case_id}/remarks",
+            "POST /api/cases/{case_id}/evidence",
             "PATCH /api/cases/{case_id}/checklist/{item_key}",
             "GET  /api/audit",
             "GET  /api/compliance",

@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import EvidenceThumb from './EvidenceThumb'
+import EvidenceUpload from './EvidenceUpload'
 import { humanDate } from '../utils/format'
 
 /**
@@ -20,6 +22,7 @@ export default function VerificationChecklist({
   canVerify,
   busy,
   onUpdate,
+  onAddEvidence,
 }) {
   const groups = []
   items.forEach((item) => {
@@ -85,6 +88,7 @@ export default function VerificationChecklist({
                     canVerify={canVerify}
                     busy={busy}
                     onUpdate={onUpdate}
+                    onAddEvidence={onAddEvidence}
                   />
                 ))}
               </ul>
@@ -102,8 +106,9 @@ export default function VerificationChecklist({
   )
 }
 
-function ChecklistRow({ item, canVerify, busy, onUpdate }) {
+function ChecklistRow({ item, canVerify, busy, onUpdate, onAddEvidence }) {
   const [open, setOpen] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
   const [remark, setRemark] = useState(item.remark || '')
   const [evidence, setEvidence] = useState(item.evidence_ref || '')
 
@@ -219,6 +224,41 @@ function ChecklistRow({ item, canVerify, busy, onUpdate }) {
                     </button>
                   </div>
                 </div>
+              )}
+            </div>
+          )}
+
+          {item.evidence?.length > 0 && (
+            <div className="mt-2">
+              <div className="label mb-1">Attached evidence</div>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {item.evidence.map((ev) => (
+                  <EvidenceThumb key={ev.id} item={ev} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {canVerify && onAddEvidence && (
+            <div className="mt-1.5">
+              <button
+                type="button"
+                className="text-2xs font-semibold text-ink-600 underline hover:text-ink-900"
+                onClick={() => setAddOpen((v) => !v)}
+              >
+                {addOpen ? 'Cancel' : '+ Add evidence'}
+              </button>
+
+              {addOpen && (
+                <EvidenceUpload
+                  signalTitle={item.signal_title}
+                  busy={busy}
+                  onCancel={() => setAddOpen(false)}
+                  onSubmit={(body) => {
+                    onAddEvidence(item.key, body)
+                    setAddOpen(false)
+                  }}
+                />
               )}
             </div>
           )}

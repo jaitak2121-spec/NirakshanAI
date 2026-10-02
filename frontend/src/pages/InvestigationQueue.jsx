@@ -148,6 +148,8 @@ export default function InvestigationQueue() {
                         <span className="text-[13px] text-ink-700">{item.primary_risk}</span>
                         <span className="mt-0.5 block text-2xs text-ink-400">
                           {item.anomaly_count} signal{item.anomaly_count === 1 ? '' : 's'}
+                          {item.evidence_count > 0 &&
+                            ` · ${item.evidence_count} evidence item${item.evidence_count === 1 ? '' : 's'}`}
                         </span>
                       </td>
 

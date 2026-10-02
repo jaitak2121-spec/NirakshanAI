@@ -333,3 +333,71 @@ class CaseEvent(Base):
             "reference": self.reference,
             "created_at": self.created_at,
         }
+
+
+class EvidenceImage(Base):
+    """A piece of visual evidence attached to a work or a case.
+
+    Additive to the original prototype. Two kinds of row live here:
+
+    * **Synthetic demonstration images**, seeded against a work (``project_id``
+      set, ``case_id`` empty, ``is_synthetic`` true). They point at small static
+      placeholder assets shipped with the frontend and are labelled as
+      demonstration material — they are not photographs of any real work.
+    * **Officer-added evidence**, attached during an investigation (``case_id``
+      set, usually tied to one verification step via ``item_key``). The image is
+      held inline as a base64 data URL — a deliberate prototype choice that needs
+      no object store and survives a warm session. Like the rest of the case
+      record it is not durable across a serverless cold start; production would
+      move the bytes to object storage.
+
+    Decoupled from :class:`Project` and :class:`InvestigationCase` with no
+    foreign key or ORM relationship, exactly like :class:`CaseEvent`: attaching
+    evidence is additive and must never cascade into, or rescore, the register.
+
+    Recording that evidence exists is not a finding. An image is a record that
+    something was looked at; it does not by itself verify a step, clear a work,
+    or establish wrongdoing.
+    """
+
+    __tablename__ = "evidence_images"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[str | None] = mapped_column(String(32), index=True)
+    case_id: Mapped[str | None] = mapped_column(String(32), index=True)
+    #: Ties the evidence to one verification step, when added against one.
+    item_key: Mapped[str | None] = mapped_column(String(64), index=True)
+
+    evidence_type: Mapped[str] = mapped_column(String(48), default="Site photograph")
+    caption: Mapped[str | None] = mapped_column(Text)
+
+    #: Exactly one of these carries the image. ``image_url`` points at a static
+    #: demonstration asset; ``image_data`` holds an uploaded base64 data URL.
+    image_url: Mapped[str | None] = mapped_column(String(300))
+    image_data: Mapped[str | None] = mapped_column(Text)
+
+    captured_date: Mapped[date | None] = mapped_column(Date)
+    uploaded_by: Mapped[str | None] = mapped_column(String(120))
+    uploaded_role: Mapped[str | None] = mapped_column(String(32))
+    reference: Mapped[str | None] = mapped_column(String(300))
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    def as_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "case_id": self.case_id,
+            "item_key": self.item_key,
+            "evidence_type": self.evidence_type,
+            "caption": self.caption,
+            "image_url": self.image_url,
+            "image_data": self.image_data,
+            "captured_date": self.captured_date,
+            "uploaded_by": self.uploaded_by,
+            "uploaded_role": self.uploaded_role,
+            "reference": self.reference,
+            "is_synthetic": self.is_synthetic,
+            "created_at": self.created_at,
+        }

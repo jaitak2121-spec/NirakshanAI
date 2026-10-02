@@ -16,7 +16,7 @@ const EVENT_LABELS = {
   CASE_OPENED_BY_OFFICER: 'Case opened by officer',
   VERIFICATION_ITEM_UPDATED: 'Verification step updated',
   REMARK_ADDED: 'Remark added',
-  EVIDENCE_ADDED: 'Evidence reference added',
+  EVIDENCE_ADDED: 'Evidence added',
   STATUS_CHANGED: 'Status changed',
   CASE_ESCALATED: 'Case escalated',
   OUTCOME_RECORDED: 'Outcome recorded',

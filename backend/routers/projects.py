@@ -16,6 +16,7 @@ from ..schemas import (
     SimilarResponse,
 )
 from ..services import analysis_service as svc
+from ..services import evidence_service
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
@@ -105,6 +106,7 @@ def get_project(
     payload["payments"] = [p.as_dict() for p in row.payments]
     payload["analysis"] = analysis
     payload["analysis"]["nearby_projects"] = svc.nearby_projects(context, project_id)
+    payload["evidence"] = evidence_service.list_for_project(db, project_id)
     return payload
 
 

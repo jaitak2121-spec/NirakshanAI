@@ -155,6 +155,9 @@ export default function CaseDetail() {
         canVerify={Boolean(data.permissions?.['case.verify']) && data.status !== 'CLOSED'}
         busy={busy}
         onUpdate={(itemKey, body) => act(() => api.updateChecklistItem(data.case_id, itemKey, body))}
+        onAddEvidence={(itemKey, body) =>
+          act(() => api.addCaseEvidence(data.case_id, { ...body, item_key: itemKey }))
+        }
       />
 
       {/* -------------------------------------------------- audit trail */}

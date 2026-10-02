@@ -33,7 +33,14 @@ from anomaly_engine.verification_checklist import (
 )
 
 from .. import rbac
-from ..models import CASE_OUTCOMES, CASE_STATUSES, CaseEvent, InvestigationCase, VerificationItem
+from ..models import (
+    CASE_OUTCOMES,
+    CASE_STATUSES,
+    CaseEvent,
+    EvidenceImage,
+    InvestigationCase,
+    VerificationItem,
+)
 from ..rbac import User
 
 # --------------------------------------------------------------------------
@@ -463,6 +470,98 @@ def add_remark(
     return event
 
 
+#: Cap on an inline base64 image. Generous for a demonstration photograph, but
+#: bounded so one upload cannot wedge a request or bloat the prototype database.
+MAX_INLINE_IMAGE_CHARS = 3_500_000  # ~2.5 MB once base64-decoded
+
+
+def add_evidence(
+    db: Session,
+    case_id: str,
+    *,
+    user: User,
+    evidence_type: str,
+    caption: str | None = None,
+    image_data: str | None = None,
+    image_url: str | None = None,
+    reference: str | None = None,
+    item_key: str | None = None,
+) -> EvidenceImage:
+    """Attach a piece of visual evidence to a case, optionally to one step.
+
+    Recording evidence is deliberately not a verification: it does not tick a
+    checklist item, move the case status, or change the risk score. It adds an
+    image and one audit line saying who attached it and when. The officer still
+    verifies the step separately, through the existing checklist action.
+    """
+    rbac.require(user, "case.verify")
+    case = get_case(db, case_id)
+    _guard_scope(user, case)
+    _guard_not_closed(case, "take further evidence")
+
+    etype = (evidence_type or "").strip() or "Site photograph"
+    image_data = (image_data or "").strip() or None
+    image_url = (image_url or "").strip() or None
+    reference = (reference or "").strip() or None
+    caption = (caption or "").strip() or None
+
+    if image_data is None and image_url is None and reference is None:
+        raise HTTPException(
+            status_code=422,
+            detail="Attach an image or a file reference — evidence cannot be empty.",
+        )
+    if image_data is not None and len(image_data) > MAX_INLINE_IMAGE_CHARS:
+        raise HTTPException(
+            status_code=413,
+            detail="The image is too large for this prototype. Use an image under about 2.5 MB.",
+        )
+
+    item = None
+    if item_key:
+        item = (
+            db.query(VerificationItem)
+            .filter(VerificationItem.case_id == case_id, VerificationItem.item_key == item_key)
+            .first()
+        )
+        if item is None:
+            raise HTTPException(
+                status_code=404, detail=f"No verification step '{item_key}' on case {case_id}."
+            )
+
+    evidence = EvidenceImage(
+        project_id=case.project_id,
+        case_id=case.case_id,
+        item_key=item_key,
+        evidence_type=etype,
+        caption=caption,
+        image_data=image_data,
+        image_url=image_url,
+        reference=reference,
+        uploaded_by=user.display_name,
+        uploaded_role=user.role,
+        is_synthetic=False,
+        created_at=_now(),
+    )
+    db.add(evidence)
+    case.updated_at = _now()
+
+    where = f" against step '{item.label}'" if item is not None else ""
+    log_event(
+        db,
+        event_type="EVIDENCE_ADDED",
+        summary=f"{etype} added to {case.case_id}{where}",
+        project_id=case.project_id,
+        case_id=case.case_id,
+        actor=user,
+        remark=caption,
+        reference=reference,
+    )
+
+    db.commit()
+    db.refresh(evidence)
+    return evidence
+
+
 def update_item(
     db: Session,
     case_id: str,
@@ -581,11 +680,29 @@ def case_detail(db: Session, case_id: str, user: User) -> dict[str, Any]:
     )
     item_dicts = [i.as_dict() for i in items]
 
+    # Evidence attached to this case, folded onto the step it belongs to so the
+    # checklist reads as one chain — AI signal, the step, the evidence, and the
+    # officer's remark. Evidence not tied to a step stays at case level.
+    evidence_rows = (
+        db.query(EvidenceImage)
+        .filter(EvidenceImage.case_id == case_id)
+        .order_by(EvidenceImage.created_at.asc(), EvidenceImage.id.asc())
+        .all()
+    )
+    evidence = [e.as_dict() for e in evidence_rows]
+    by_item: dict[str, list] = {}
+    for item in evidence:
+        if item["item_key"]:
+            by_item.setdefault(item["item_key"], []).append(item)
+    for entry in item_dicts:
+        entry["evidence"] = by_item.get(entry["key"], [])
+
     payload = case.as_dict()
     payload.update(
         {
             "status_meaning": STATUS_MEANING.get(case.status, ""),
             "checklist": item_dicts,
+            "evidence": evidence,
             "checklist_summary": checklist_summary(item_dicts),
             "checklist_note": CHECKLIST_NOTE,
             "audit_trail": audit_trail(db, case_id=case_id),

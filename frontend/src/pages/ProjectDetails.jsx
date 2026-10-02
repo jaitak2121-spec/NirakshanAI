@@ -2,7 +2,9 @@ import { Fragment, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import AnomalyCard from '../components/AnomalyCard'
 import EvidenceCard from '../components/EvidenceCard'
+import EvidenceGallery from '../components/EvidenceGallery'
 import ProgressBar, { ProgressPair } from '../components/ProgressBar'
+import ProgressComparisonChart from '../components/ProgressComparisonChart'
 import RiskBadge from '../components/RiskBadge'
 import RiskScore from '../components/RiskScore'
 import ProximityMap from '../components/ProximityMap'
@@ -234,6 +236,10 @@ export default function ProjectDetails() {
                 physical={project.physical_progress}
                 financial={project.financial_progress}
               />
+              <ProgressComparisonChart
+                physical={project.physical_progress}
+                financial={project.financial_progress}
+              />
               <div className="mt-3 border-t border-ink-100 pt-3">
                 <span className="label mr-2">Status</span>
                 <span className="text-[13px] font-semibold text-ink-800">
@@ -330,6 +336,8 @@ export default function ProjectDetails() {
               </table>
             </section>
           )}
+
+          <EvidenceGallery evidence={project.evidence || []} />
         </div>
 
         {/* Right: the assessment -------------------------------------- */}

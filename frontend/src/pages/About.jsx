@@ -268,7 +268,8 @@ const LIMITATIONS = [
   'A missing field cannot be distinguished from a field that is genuinely not applicable. Both reduce the data quality score.',
   'Scores are comparable within this dataset only. A score of 60 is not an absolute measure of anything.',
   'Authentication is a demonstration identity switcher, not a login. Role-based scoping and the audit trail are real and enforced on the server, but anyone can select any role — the prototype demonstrates what the controls do, not the identity assurance a deployed system would need.',
-  'On the hosted deployment the database is written to temporary storage, so cases, verification marks and audit entries created there do not survive a cold start. Run the prototype locally for case work that needs to persist.',
+  'On the hosted deployment the database is written to temporary storage, so cases, verification marks, officer-uploaded evidence and audit entries created there do not survive a cold start. Run the prototype locally for case work that needs to persist.',
+  'The site & evidence images shipped with a few works are synthetic placeholders, not photographs of any real work. Officer-uploaded evidence is held inline in the prototype database; a deployment would store images in an object store with signed access, and attaching an image records that something was looked at — it is not by itself a verification or a finding.',
   'No trained machine-learning model is used anywhere. Every score, similarity figure and indicator on these screens is arithmetic over the recorded fields, which is why each one can be shown in full.',
   'The prototype has been exercised against 26 records. No benchmark has been run at larger volumes, so no claim is made about its behaviour on a full national register.',
 ]

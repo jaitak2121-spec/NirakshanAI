@@ -19,7 +19,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from backend.database import SessionLocal  # noqa: E402
 from backend.main import app  # noqa: E402
-from backend.models import CaseEvent, InvestigationCase, VerificationItem  # noqa: E402
+from backend.models import (  # noqa: E402
+    CaseEvent,
+    EvidenceImage,
+    InvestigationCase,
+    VerificationItem,
+)
 from tools.asgi_client import Client  # noqa: E402
 
 OUT = Path(__file__).resolve().parents[1] / "frontend" / "src" / "__fixtures__"
@@ -119,12 +124,19 @@ def seed_case(client: Client) -> str:
 
 
 def clear_cases() -> None:
-    """Remove every case row, so the committed database ships clean."""
+    """Remove every case row, so the committed database ships clean.
+
+    Officer-added evidence (anything tied to a case) is cleared too; the seeded
+    synthetic project images have no case id and are left in place.
+    """
     db = SessionLocal()
     try:
         db.query(VerificationItem).delete()
         db.query(CaseEvent).delete()
         db.query(InvestigationCase).delete()
+        db.query(EvidenceImage).filter(EvidenceImage.case_id.isnot(None)).delete(
+            synchronize_session=False
+        )
         db.commit()
     finally:
         db.close()

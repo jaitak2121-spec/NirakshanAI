@@ -137,6 +137,12 @@ export const api = {
       method: 'POST',
       body: { remark, reference },
     }),
+  addCaseEvidence: (caseId, body, opts) =>
+    request(`/cases/${encodeURIComponent(caseId)}/evidence`, {
+      ...opts,
+      method: 'POST',
+      body,
+    }),
   updateChecklistItem: (caseId, itemKey, body, opts) =>
     request(
       `/cases/${encodeURIComponent(caseId)}/checklist/${itemKey

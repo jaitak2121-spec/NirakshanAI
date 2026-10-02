@@ -109,14 +109,24 @@ def init_db(force_reseed: bool = False) -> dict:
     demo and no manual database step is required.
     """
     from . import models  # noqa: F401  (registers mappers)
-    from .data.seed_data import seed
+    from .data.seed_data import seed, seed_evidence_if_empty
 
     Base.metadata.create_all(bind=engine)
 
     with SessionLocal() as db:
         existing = db.query(models.Project).count()
         if existing and not force_reseed:
-            return {"seeded": False, "projects": existing, "database": str(DB_PATH)}
+            # The register is already populated. Still make sure the additive
+            # synthetic evidence images exist, so a database seeded before this
+            # feature was added gains them without a full reseed and without
+            # touching the register or any case activity.
+            evidence = seed_evidence_if_empty(db)
+            return {
+                "seeded": False,
+                "projects": existing,
+                "evidence": evidence,
+                "database": str(DB_PATH),
+            }
 
         if force_reseed:
             db.query(models.Payment).delete()

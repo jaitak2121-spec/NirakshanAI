@@ -29,7 +29,7 @@ from datetime import date
 
 from sqlalchemy.orm import Session
 
-from ..models import Payment, Project
+from ..models import EvidenceImage, Payment, Project
 
 # Fictitious MP names used purely as record labels.
 MP = {
@@ -532,4 +532,102 @@ def seed(db: Session) -> dict:
             payment_count += 1
 
     db.commit()
-    return {"projects": len(PROJECTS), "payments": payment_count}
+    evidence_count = seed_evidence_if_empty(db)
+    return {"projects": len(PROJECTS), "payments": payment_count, "evidence": evidence_count}
+
+
+# --------------------------------------------------------------------------- #
+# Synthetic site & evidence images (additive)
+#
+# Clearly-labelled demonstration images for a few works, so the evidence gallery
+# and the AI-signal -> verification -> evidence story have something to show.
+# Each points at a small static placeholder asset shipped with the frontend
+# (frontend/public/evidence/*.svg); none is a photograph of any real work. The
+# captions describe recorded fields, never a finding.
+# --------------------------------------------------------------------------- #
+_SYN = "Synthetic demonstration evidence"
+
+EVIDENCE: list[dict] = [
+    # ---- HERO: community hall, Rampur (multi-signal) --------------------- #
+    dict(
+        project_id="MPLAD-2026-024",
+        evidence_type="Site photograph",
+        caption="Approach to the community hall site at Rampur village.",
+        image_url="/evidence/site.svg",
+        captured_date=D(2025, 9, 12),
+        uploaded_by=_SYN, is_synthetic=True,
+    ),
+    dict(
+        project_id="MPLAD-2026-024",
+        evidence_type="Work-progress photograph",
+        caption="Assembly-area structure under construction; recorded physical progress 41%.",
+        image_url="/evidence/progress.svg",
+        captured_date=D(2025, 11, 20),
+        uploaded_by=_SYN, is_synthetic=True,
+    ),
+    dict(
+        project_id="MPLAD-2026-024",
+        evidence_type="Location photograph",
+        caption="Plot and surroundings recorded for the Rampur community hall.",
+        image_url="/evidence/location.svg",
+        captured_date=D(2025, 9, 12),
+        uploaded_by=_SYN, is_synthetic=True,
+    ),
+    dict(
+        project_id="MPLAD-2026-024",
+        evidence_type="Related-project photograph",
+        caption="Comparable community-centre work MPLAD-2026-025 in the same village, shown for side-by-side review.",
+        image_url="/evidence/related.svg",
+        captured_date=D(2026, 1, 8),
+        uploaded_by=_SYN, is_synthetic=True,
+    ),
+    # ---- the comparable work -------------------------------------------- #
+    dict(
+        project_id="MPLAD-2026-025",
+        evidence_type="Site photograph",
+        caption="Community centre site at Rampur village.",
+        image_url="/evidence/site.svg",
+        captured_date=D(2025, 12, 5),
+        uploaded_by=_SYN, is_synthetic=True,
+    ),
+    dict(
+        project_id="MPLAD-2026-025",
+        evidence_type="Work-progress photograph",
+        caption="Assembly hall under construction; recorded physical progress 72%.",
+        image_url="/evidence/progress.svg",
+        captured_date=D(2026, 1, 15),
+        uploaded_by=_SYN, is_synthetic=True,
+    ),
+    # ---- Wadi internal road (overlap pair) ------------------------------ #
+    dict(
+        project_id="MPLAD-2026-020",
+        evidence_type="Site photograph",
+        caption="Internal road alignment in Ward No. 5, Wadi.",
+        image_url="/evidence/site.svg",
+        captured_date=D(2025, 11, 2),
+        uploaded_by=_SYN, is_synthetic=True,
+    ),
+    dict(
+        project_id="MPLAD-2026-020",
+        evidence_type="Work-progress photograph",
+        caption="Road and side-drain works in progress; recorded physical progress 70%.",
+        image_url="/evidence/progress.svg",
+        captured_date=D(2026, 1, 10),
+        uploaded_by=_SYN, is_synthetic=True,
+    ),
+]
+
+
+def seed_evidence_if_empty(db: Session) -> int:
+    """Seed the synthetic demonstration images, only if none are present.
+
+    Gated on the evidence table being empty rather than on the project count, so
+    a database seeded before this feature existed gains the images on next start
+    without the register — or any case activity — being touched or wiped.
+    """
+    if db.query(EvidenceImage).count():
+        return 0
+    for record in EVIDENCE:
+        db.add(EvidenceImage(**record))
+    db.commit()
+    return len(EVIDENCE)
